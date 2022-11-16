@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -13,8 +16,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 ImageView imageView;
-Button preButton, nextButton;
+Button preButton, nextButton, addImage;
 ArrayList<String> listImageUrl;
+    EditText urlImage;
 int imageIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,12 +28,11 @@ int imageIndex;
         imageView = findViewById(R.id.imageView);
         preButton = findViewById(R.id.button_prev);
         nextButton = findViewById(R.id.button_next);
+        urlImage = findViewById(R.id.urlImage);
+
 
         //add image to array
         listImageUrl = new ArrayList<>();
-        listImageUrl.add("https://www.apple.com/v/iphone-14-pro/a/images/meta/iphone-14-pro_overview__e2a7u9jy63ma_og.png?202209282359");
-        listImageUrl.add("https://media.techz.vn/media2019/upload2019/2022/08/28/cuando-sale-el-iphone-14.jpeg");
-        listImageUrl.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9kruEJ7cqNS_qIYgIrAloVCv5iu1ut_JhiIQnqnSH-qq6S0jVgKf2U_YOdXzVHTttOI0&usqp=CAU");
 
         //set image index first
         imageIndex = 1;
@@ -66,8 +69,35 @@ int imageIndex;
                 displayImages();
             }
         });
+        addImage = findViewById(R.id.buttonAdd);
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String img = urlImage.getText().toString().trim();
+                if (img.length() != 0) {
+                    if (URLUtil.isValidUrl(img)) {
+                        listImageUrl.add(img);
+                        imageIndex = listImageUrl.size() - 1;
+                        urlImage.setText("");
+                        displayImages();
+                    } else {
+                        Toast.makeText(
+                                MainActivity.this,
+                                "Url is incorrect!", Toast.LENGTH_LONG
+                        ).show();
+                    }
+                } else {
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Url is null. Please check valid input!",
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
+        });
     }
     void displayImages(){
+        Toast.makeText(this, "Loading...", Toast.LENGTH_LONG).show();
         Picasso.get().load(listImageUrl.get(imageIndex)).resize(900, 700).into(imageView);
     }
 }
